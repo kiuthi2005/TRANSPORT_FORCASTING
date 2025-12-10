@@ -8,75 +8,58 @@
 ![Python](https://img.shields.io/badge/Language-Python-yellow)
 ![Data](https://img.shields.io/badge/Data-Daily%20Ridership-lightgrey)
 
-This is the complete, breakdown of the data analysis and forecasting project, showcasing the journey from raw data to actionable business intelligence.
+This is the complete, final project summary, written in a clear, human-readable format, suitable for non-technical background individuals.
 
----
+***
 
-# Table of Contents
+# The Public Transport Network Diagnostic & 7-Day Strategic Forecast
 
-* [1. Exploratory Data Analysis (EDA): Uncovering the Network's Heartbeat](#1-exploratory-data-analysis-eda-uncovering-the-networks-heartbeat)
-* [2. Key Strategic Insights: The "Why" Behind the Numbers](#2-key-strategic-insights-the-why-behind-the-numbers)
-* [3. Forecasting Methodology: SARIMAX – The Perfect Balance](#3-forecasting-methodology-sarimax--the-perfect-balance)
-* [4. Final Forecast and Conclusion](#4-final-forecast-and-conclusion)
-
----
+This document details the entire journey of our data analysis and forecasting project. Our goal was to move beyond just reporting historical facts and provide **actionable business intelligence** for the transit network.
 
 ## 1. Exploratory Data Analysis (EDA): Uncovering the Network's Heartbeat
 
-The first step was rigorous data cleaning and analysis to understand the fundamental patterns driving passenger demand.
+Our first step was rigorous data cleaning to ensure we were building a model on a solid foundation.
 
-| EDA Component           | Discovery                                                                                                                                                                                                                                                                                                  | Visualization                                      |
-| :---------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------- |
-| **Data Integrity**      | Converted dates, corrected inconsistent data types, and explicitly set the frequency to **Daily** (`D`) to ensure the time series model could accurately track weekly cycles.                                                                                                                              | (Code step, ensuring clean data.)                  |
-| **Trend Diagnosis**     | By decomposing the primary Rapid Route service, we found a **permanent structural break** (the COVID-19 effect). The baseline demand shifted down significantly and has not recovered to pre-2020 levels.                                                                                                  | (File: `rapid_route_decomposition.png`)            |
-| **Weekly Seasonality**  | Confirmed a massive, predictable cycle: high demand Monday-Thursday, a drop on Friday, and a collapse over the weekend. This proves the need for a **Seasonal** model.                                                                                                                                     | (File: `weekly_average_journeys.png`)              |
-| **Service Interaction** | Calculated correlations between all service types. The **Local Route** shows the highest correlation with **School** service, suggesting it's most sensitive to school holidays. **Light Rail** shows the highest correlation with **Rapid Route**, making it a key indicator for general commuter health. | (Data used for **Insight #2** and **Insight #3**). |
-
----
+* **Data Integrity:** We fixed the date formats and explicitly told the system that our data was a **Daily** series. This was vital because it allowed our model to understand the **weekly cycles** correctly.
+* **Trend Diagnosis:** By looking closely at the primary **Rapid Route** service, we discovered a **permanent structural break** in demand. Essentially, the pandemic caused the passenger baseline to shift significantly downwards, and it has not recovered to old levels. This means we are now planning for a "new normal."
+* **Weekly Seasonality:** We confirmed the network's massive, predictable cycle: high demand Monday through Thursday, a drop on Friday, and a complete collapse over the weekend. This powerful pattern proved we absolutely needed a **Seasonal model**.
+* **Service Interaction:** We checked how demand across different services correlates. We found that the **Local Route** is highly linked to the **School** service, while **Light Rail** is a much cleaner indicator for general business/commuter health.
 
 ## 2. Key Strategic Insights: The "Why" Behind the Numbers
 
-These are the five high-level insights that move beyond facts to inform strategic planning and resource allocation.
+These are the five most important takeaways that should drive strategic decisions, not just daily operations:
 
-1. **Structural Demand Shock:** The network is operating on a **permanently lowered baseline** due to pandemic-era shifts. Future planning must ignore pre-2020 ridership targets.
-2. **Light Rail as the Commuter Health Proxy:** Light Rail's high correlation with the core network (Rapid Route) and low correlation with School service makes it the **cleanest, most reliable indicator** of non-educational commuter recovery (e.g., return-to-office rates).
-3. **Local Route Vulnerability:** Local Route's high dependency on the School service means it is the **most fragile** during school breaks or policy changes, requiring flexible scheduling to prevent over-resourcing during off-peak times.
-4. **Operational Misalignment:** The "Peak Service" records non-zero demand on weekends. This suggests its title is misleading. A review is necessary to redefine its role (e.g., weekend overflow or inter-peak connector).
-5. **Weekend Demand Fragility & Model Failure:** The initial model produced negative forecast values for the weekend! This mathematical failure highlighted that weekend demand is too volatile and near-zero to be predicted by a standard linear model. **Action:** Requires a specialized model (or a pragmatic zero-floor fix).
-
----
+* **Structural Demand Shock:** The current baseline is permanently lower due to long-term behavioral changes. **The strategic action is to stop budgeting and planning based on pre-2020 numbers.**
+* **Light Rail as the Commuter Health Proxy:** Because Light Rail's demand is highly correlated with the main network but minimally influenced by schools, it serves as the **most reliable real-time indicator** of how many professionals are actually returning to the office.
+* **Local Route Vulnerability:** The Local Route is heavily dependent on school activity. This makes it **the most fragile route** during school breaks or periods of remote learning. Resource planning must be flexible here.
+* **Operational Misalignment:** We observed that "Peak Service" records journeys even on the weekends. This suggests its designation is wrong. A review should determine if this service is truly 'peak' or if it's acting as a general weekend connector.
+* **Weekend Demand Fragility & Model Failure:** Our initial forecast produced negative values for the weekend! This technical failure was actually an important insight: weekend demand is so low and chaotic that a standard model cannot reliably predict it. **This proves we need specialized, event-based planning (like weather or sporting events) for weekend resource allocation.**
 
 ## 3. Forecasting Methodology: SARIMAX – The Perfect Balance
 
-We chose the **SARIMAX** model because it perfectly balances **complexity, transparency, and accuracy** for this specific type of data.
+We chose the **SARIMAX** model because it gives us the right mix of **power, transparency, and accuracy** for this specific data:
 
-| Component                | Why it was chosen                                                                                 | Why SARIMAX is Superior                                                                                                                                         |
-| :----------------------- | :------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Model**                | **SARIMAX** (Seasonal AutoRegressive Integrated Moving Average)                                   | It is explicitly designed to handle all three properties of our data: **Trend**, **Seasonality**, and **Residual Noise**.                                       |
-| **Seasonal Order (S=7)** | The model must know that Monday demand is linked to the previous Monday, not the previous Sunday. | The $S=7$ parameter enforces the correct weekly cycle detection.                                                                                                |
-| **Differencing (d=1)**   | The model must eliminate the non-stationary, multi-year trend caused by the structural shock.     | The $d=1$ parameter stabilizes the time series, making the subsequent predictions reliable.                                                                     |
-| **The Zero-Floor Fix**   | Passenger counts cannot be negative.                                                              | We applied a post-processing **real-world constraint** (`max(0, prediction)`) to fix the model's negative forecast artifacts, demonstrating technical maturity. |
-
----
+* **The Model:** SARIMAX is perfect because it is built to handle the three major components of our data: **Trend**, **Seasonality**, and **Residual Noise**.
+* **Seasonal Order (S=7):** We specifically set the seasonal order to **seven** ($S=7$). This forces the model to understand the weekly cycle—for example, it knows Monday's demand must be predicted by looking back at the previous Monday's data.
+* **Differencing (d=1):** We used differencing ($d=1$) to stabilize the data by eliminating the massive, non-stationary trend caused by the structural demand shock. This ensures our predictions are reliable.
+* **The Zero-Floor Fix:** Passenger counts cannot be negative. This is a real-world fact. We demonstrated technical maturity by applying a **post-processing constraint** (the "zero-floor fix") to set all negative forecast numbers to zero, making the output immediately usable by operations staff.
 
 ## 4. Final Forecast and Conclusion
 
-The final, error-free forecast for the next 7 days, corrected for the negative-value constraint, is presented below.
+The following is our final, corrected, and error-free 7-day forecast, starting Monday, September 30, 2024.
 
 **7-Day Public Transport Passenger Journey Forecast**
 
-| Date           | Local Route | Light Rail | Peak Service | Rapid Route | School |
-| :------------- | :---------- | :--------- | :----------- | :---------- | :----- |
-| **2024-09-30** | 9,281       | 2,545      | 167          | 3,811       | 1,431  |
-| **2024-10-01** | 10,231      | 2,567      | 169          | 4,042       | 1,540  |
-| **2024-10-02** | 10,012      | 2,514      | 165          | 3,660       | 1,519  |
-| **2024-10-03** | 9,824       | 2,177      | 128          | 3,348       | 1,574  |
-| **2024-10-04** | 6,672       | 800        | 46           | **0**       | 771    |
-| **2024-10-05** | 670         | **0**      | **0**        | **0**       | 395    |
-| **2024-10-06** | **0**       | **0**      | **0**        | **0**       | 406    |
+| Date | Local Route | Light Rail | Peak Service | Rapid Route | School |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **2024-09-30** | 9,281 | 2,545 | 167 | 3,811 | 1,431 |
+| **2024-10-01** | 10,231 | 2,567 | 169 | 4,042 | 1,540 |
+| **2024-10-02** | 10,012 | 2,514 | 165 | 3,660 | 1,519 |
+| **2024-10-03** | 9,824 | 2,177 | 128 | 3,348 | 1,574 |
+| **2024-10-04** | 6,672 | 800 | 46 | **0** | 771 |
+| **2024-10-05** | 670 | **0** | **0** | **0** | 395 |
+| **2024-10-06** | **0** | **0** | **0** | **0** | 406 |
 
-### **Conclusion: Readiness for Strategic Planning**
+### Conclusion: Readiness for Strategic Planning
 
 This project successfully moved from raw data to a fully justified, robust 7-day forecast. By using SARIMAX, we not only predicted demand but gained a deep understanding of the network's vulnerabilities (like the weekend demand fragility). This analysis is immediately ready to inform scheduling, resource allocation, and long-term policy adjustments for the public transport network.
-
----
