@@ -36,7 +36,7 @@ These are the five most important takeaways that should drive strategic decision
 We chose the **SARIMAX** model because it gives us the right mix of **power, transparency, and accuracy** for this specific data:
 
 * **The Model:** SARIMAX is perfect because it is built to handle the three major components of our data: **Trend**, **Seasonality**, and **Residual Noise**.
-* **Seasonal Order (S=7):** We specifically set the seasonal order to **seven** ($S=7$). This forces the model to understand the weekly cycle—for example, it knows Monday's demand must be predicted by looking back at the previous Monday's data.
+* **Seasonal Order (S=7):** We specifically set the seasonal order to **seven** ($S=7$). This forces the model to understand the weekly cycle for example, it knows Monday's demand must be predicted by looking back at the previous Monday's data.
 * **Differencing (d=1):** We used differencing ($d=1$) to stabilize the data by eliminating the massive, non-stationary trend caused by the structural demand shock. This ensures our predictions are reliable.
 * **The Zero-Floor Fix:** Passenger counts cannot be negative. This is a real-world fact. We demonstrated technical maturity by applying a **post-processing constraint** (the "zero-floor fix") to set all negative forecast numbers to zero, making the output immediately usable by operations staff.
 
