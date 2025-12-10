@@ -8,9 +8,7 @@
 ![Python](https://img.shields.io/badge/Language-Python-yellow)
 ![Data](https://img.shields.io/badge/Data-Daily%20Ridership-lightgrey)
 
-This is the complete, final project summary, written in a clear, human-readable format, suitable for non-technical background individuals.
 
-***
 
 # The Public Transport Network Diagnostic & 7-Day Strategic Forecast
 
