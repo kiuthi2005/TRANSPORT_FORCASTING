@@ -10,8 +10,6 @@
 
 
 
-# The Public Transport Network Diagnostic & 7-Day Strategic Forecast
-
 This document details the entire journey of our data analysis and forecasting project. Our goal was to move beyond just reporting historical facts and provide **actionable business intelligence** for the transit network.
 
 ## 1. Exploratory Data Analysis (EDA): Uncovering the Network's Heartbeat
